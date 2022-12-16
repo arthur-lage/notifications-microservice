@@ -1,11 +1,12 @@
-import { Replace } from "src/application/helpers/Replace";
+import { Replace } from "@helpers/Replace";
 import { randomUUID } from "crypto";
 
-interface NotificationProps {
+export interface NotificationProps {
   recipientId: string;
   content: string;
   category: string;
   readAt?: Date | null;
+  canceledAt?: Date | null;
   createdAt: Date;
 }
 
@@ -49,12 +50,20 @@ export class Notification {
     this.props.recipientId = recipientId;
   }
 
-  public get readAt(): Date | null {
+  public get readAt(): Date | null | undefined {
     return this.props.readAt;
   }
 
-  public set readAt(readAt: Date | null) {
+  public set readAt(readAt: Date | null | undefined) {
     this.props.readAt = readAt;
+  }
+
+  public cancel() {
+    this.props.canceledAt = new Date();
+  }
+
+  public get canceledAt(): Date | null | undefined {
+    return this.props.canceledAt;
   }
 
   public get createdAt(): Date {
