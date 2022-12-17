@@ -8,4 +8,6 @@ export abstract class NotificationRepository {
   abstract getRecipientNotifications(
     recipientId: string
   ): Promise<Notification[]>;
+  abstract readNotification(notificationId: string): Promise<void>;
+  abstract unreadNotification(notificationId: string): Promise<void>;
 }

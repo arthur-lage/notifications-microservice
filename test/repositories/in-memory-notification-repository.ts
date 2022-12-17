@@ -47,4 +47,24 @@ export class InMemoryNotificationRepository implements NotificationRepository {
 
     return recipientNotifications;
   }
+
+  async readNotification(notificationId: string): Promise<void> {
+    const notificationIndex = await this.notifications.findIndex(
+      ({ id }) => id === notificationId
+    );
+
+    if (notificationIndex >= 0) {
+      this.notifications[notificationIndex].read();
+    }
+  }
+
+  async unreadNotification(notificationId: string): Promise<void> {
+    const notificationIndex = await this.notifications.findIndex(
+      ({ id }) => id === notificationId
+    );
+
+    if (notificationIndex >= 0) {
+      this.notifications[notificationIndex].unread();
+    }
+  }
 }

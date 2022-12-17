@@ -3,6 +3,7 @@ import { NotificationRepository } from "@application/repositories/notification-r
 import { PrismaService } from "../prisma.service";
 import { Injectable } from "@nestjs/common";
 import { PrismaNotificationMapper } from "../mappers/prisma-notification-mapper";
+import { NotificationNotFound } from "../../../../application/use-cases/errors/notification-not-found";
 
 @Injectable()
 export class PrismaNotificationsRepositories implements NotificationRepository {
@@ -25,7 +26,11 @@ export class PrismaNotificationsRepositories implements NotificationRepository {
       },
     });
 
-    return notification;
+    if (!notification) {
+      throw new NotificationNotFound();
+    }
+
+    return PrismaNotificationMapper.toDomain(notification);
   }
 
   async create(notification: Notification): Promise<void> {
@@ -54,6 +59,40 @@ export class PrismaNotificationsRepositories implements NotificationRepository {
       },
     });
 
-    return notifications;
+    return notifications.map((notification) =>
+      PrismaNotificationMapper.toDomain(notification)
+    );
+  }
+
+  async readNotification(notificationId: string): Promise<void> {
+    const savedNotification = await this.prismaService.notification.findUnique({
+      where: { id: notificationId },
+    });
+
+    if (!savedNotification) {
+      throw new NotificationNotFound();
+    }
+
+    const notification = PrismaNotificationMapper.toDomain(savedNotification);
+
+    notification.read();
+
+    this.save(notification);
+  }
+
+  async unreadNotification(notificationId: string): Promise<void> {
+    const savedNotification = await this.prismaService.notification.findUnique({
+      where: { id: notificationId },
+    });
+
+    if (!savedNotification) {
+      throw new NotificationNotFound();
+    }
+
+    const notification = PrismaNotificationMapper.toDomain(savedNotification);
+
+    notification.unread();
+
+    this.save(notification);
   }
 }
